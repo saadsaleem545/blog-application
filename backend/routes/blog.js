@@ -35,3 +35,16 @@ router.get('/', async (req, res) => {
 });
 
 module.exports = router;
+
+// Get Single Blog by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findOne({ _id: req.params.id });
+        if (!blog) {
+            return res.status(404).json({ message: 'Blog post not found' });
+        }
+        res.status(200).json(blog);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+});

@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="category">${blog.category}</span>
                     <h3>${blog.title}</h3>
                     <p class="meta">By ${blog.authorName || 'Saad'} • ${new Date(blog.createdAt).toLocaleDateString()}</p>
-                    <p class="snippet">${blog.content}</p>
-                    <a href="#" class="read-more">Read Article →</a>
+                    <p class="snippet">${blog.content.substring(0, 100)}...</p>
+                    <a href="blog-detail.html?id=${blog._id}" class="read-more">Read Article →</a>
                 </article>
             `).join('');
         } catch (err) {
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (err) {
                 console.error(err);
                 alert("Connection Error: " + err.message);
-}
+            }
         });
     }
 
@@ -135,5 +135,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Server Connection Error");
             }
         });
+    }
+
+    // ------------------------------------------
+    // 5. FETCH SINGLE BLOG DETAILS (Module 3 Feature)
+    // ------------------------------------------
+    const blogDetailContainer = document.getElementById("blogDetailContainer");
+    if (blogDetailContainer) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const blogId = urlParams.get("id");
+
+        if (blogId) {
+            fetchSingleBlog(blogId);
+        } else {
+            blogDetailContainer.innerHTML = "<p>Invalid Blog Post ID.</p>";
+        }
+    }
+
+    async function fetchSingleBlog(id) {
+        try {
+            const res = await fetch(`${API_URL}/blogs/${id}`);
+            const blog = await res.json();
+
+            if (res.ok) {
+                blogDetailContainer.innerHTML = `
+                    <span class="category" style="background:#007bff; color:#fff; padding:4px 8px; border-radius:4px;">${blog.category}</span>
+                    <h1 style="margin: 15px 0;">${blog.title}</h1>
+                    <p class="meta" style="color: #666; margin-bottom: 20px;">
+                        By ${blog.authorName || 'Saad'} • ${new Date(blog.createdAt).toLocaleDateString()}
+                    </p>
+                    <div class="blog-content" style="line-height: 1.8; font-size: 1.1rem; border-top: 1px solid #eee; padding-top: 15px;">
+                        <p>${blog.content}</p>
+                    </div>
+                    <br>
+                    <a href="index.html" style="display: inline-block; text-decoration: none; color: #007bff;">← Back to Home</a>
+                `;
+            } else {
+                blogDetailContainer.innerHTML = `<p>${blog.message || 'Error loading post.'}</p>`;
+            }
+        } catch (err) {
+            blogDetailContainer.innerHTML = "<p>Server Connection Error</p>";
+        }
     }
 });
