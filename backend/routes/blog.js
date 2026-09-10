@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Blog = require('../models/Blog');
+const verifyToken = require('../middleware/auth');
 
-// 1. CREATE BLOG (POST /api/blogs/create)
-router.post('/create', async (req, res) => {
+// 1. CREATE BLOG (Protected)
+router.post('/create', verifyToken, async (req, res) => {
     try {
-        const { title, category, content, authorName } = req.body;
+        const { title, category, content } = req.body;
         if (!title || !category || !content) {
             return res.status(400).json({ message: 'Please fill all fields.' });
         }
@@ -14,7 +15,8 @@ router.post('/create', async (req, res) => {
             title,
             category,
             content,
-            authorName: authorName || 'Saad Saleem',
+            authorId: req.user.id,
+            authorName: req.user.fullName || 'Saad Saleem',
             createdAt: new Date()
         });
 
@@ -24,7 +26,7 @@ router.post('/create', async (req, res) => {
     }
 });
 
-// 2. GET ALL BLOGS (GET /api/blogs)
+// 2. GET ALL PUBLIC BLOGS
 router.get('/', async (req, res) => {
     try {
         const blogs = await Blog.find({}).sort({ createdAt: -1 });
@@ -34,7 +36,17 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 3. GET SINGLE BLOG BY ID (GET /api/blogs/:id)
+// 3. GET LOGGED-IN USER'S BLOGS ONLY (Protected - Module 5)
+router.get('/user/my-blogs', verifyToken, async (req, res) => {
+    try {
+        const userBlogs = await Blog.find({ authorId: req.user.id }).sort({ createdAt: -1 });
+        res.status(200).json(userBlogs);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+});
+
+// 4. GET SINGLE BLOG BY ID
 router.get('/:id', async (req, res) => {
     try {
         const blog = await Blog.findOne({ _id: req.params.id });
@@ -47,12 +59,12 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// 4. UPDATE BLOG BY ID (PUT /api/blogs/:id)
-router.put('/:id', async (req, res) => {
+// 5. UPDATE BLOG BY ID (Protected)
+router.put('/:id', verifyToken, async (req, res) => {
     try {
         const { title, category, content } = req.body;
         const updatedBlog = await Blog.update(
-            { _id: req.params.id },
+            { _id: req.params.id, authorId: req.user.id },
             { $set: { title, category, content } },
             { returnUpdatedDocs: true }
         );
@@ -62,15 +74,14 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// 5. DELETE BLOG BY ID (DELETE /api/blogs/:id)
-router.delete('/:id', async (req, res) => {
+// 6. DELETE BLOG BY ID (Protected)
+router.delete('/:id', verifyToken, async (req, res) => {
     try {
-        await Blog.remove({ _id: req.params.id }, {});
+        await Blog.remove({ _id: req.params.id, authorId: req.user.id }, {});
         res.status(200).json({ message: 'Blog deleted successfully!' });
     } catch (error) {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
 });
 
-// Note: Always keep module.exports at the VERY END of the file
 module.exports = router;
