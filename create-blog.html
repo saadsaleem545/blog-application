@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBlog - Create Blog</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.html">DevBlog</a>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="create-blog.html" class="active">Create Blog</a></li>
+                <li><a href="login.html" class="btn-login">Login</a></li>
+                <li><a href="register.html" class="btn-register">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Create Blog Form Container -->
+    <main class="auth-container">
+        <div class="blog-form-card">
+            <h2>Write New Article</h2>
+            <p class="auth-subtitle">Share your tech knowledge with the community.</p>
+
+            <form id="createBlogForm" class="auth-form">
+                <div class="form-group">
+                    <label for="postTitle">Blog Title</label>
+                    <input type="text" id="postTitle" placeholder="e.g. Master CSS Grid Layouts" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="postCategory">Category</label>
+                    <select id="postCategory" required>
+                        <option value="" disabled selected>Select Category</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Design">Design</option>
+                        <option value="DevOps">DevOps</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="postContent">Article Body</label>
+                    <textarea id="postContent" rows="8" placeholder="Write your full blog post here..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">Publish Article</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 DevBlog. Built with HTML, CSS & JS.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

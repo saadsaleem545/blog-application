@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBlog - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.html">DevBlog</a>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="create-blog.html">Create Blog</a></li>
+                <li><a href="login.html" class="btn-login">Login</a></li>
+                <li><a href="register.html" class="btn-register">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="container">
+        <div class="dashboard-header">
+            <div>
+                <h2>User Dashboard</h2>
+                <p>Manage your published blogs and articles.</p>
+            </div>
+            <a href="create-blog.html" class="btn-primary">+ Create New Blog</a>
+        </div>
+
+        <!-- Table View for Managed Posts -->
+        <div class="table-container">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Date Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="post-title">Getting Started with Web Development</td>
+                        <td>Frontend</td>
+                        <td>Sep 10, 2026</td>
+                        <td><span class="badge badge-success">Published</span></td>
+                        <td class="action-buttons">
+                            <button class="btn-edit">Edit</button>
+                            <button class="btn-delete">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="post-title">Mastering Responsive Layouts</td>
+                        <td>Design</td>
+                        <td>Sep 08, 2026</td>
+                        <td><span class="badge badge-success">Published</span></td>
+                        <td class="action-buttons">
+                            <button class="btn-edit">Edit</button>
+                            <button class="btn-delete">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 DevBlog. Built with HTML, CSS & JS.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
