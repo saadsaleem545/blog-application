@@ -1,7 +1,41 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://blog-application-2mgp.onrender.com/api";
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DevBlog Frontend & Backend Connected!");
+
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    // ------------------------------------------
+    // 0. AUTH & NAVBAR USER PROFILE CHECK
+    // ------------------------------------------
+    const userInfo = document.getElementById("userInfo");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const welcomeUserName = document.getElementById("welcomeUserName");
+
+    if (token && user) {
+        if (userInfo) userInfo.innerText = `👤 ${user.fullName}`;
+        if (logoutBtn) logoutBtn.style.display = "inline-block";
+        if (welcomeUserName) welcomeUserName.innerText = user.fullName;
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            alert("Logged out successfully!");
+            window.location.href = "login.html";
+        });
+    }
+
+    // PROTECTED ROUTE CHECK: Redirect to Login if accessing Dashboard without Token
+    const isDashboardPage = window.location.pathname.includes("dashboard.html");
+    const isCreateBlogPage = window.location.pathname.includes("create-blog.html");
+    if ((isDashboardPage || isCreateBlogPage) && !token) {
+        alert("Please login first to access this page!");
+        window.location.href = "login.html";
+        return;
+    }
 
     // ------------------------------------------
     // 1. FETCH & DISPLAY BLOGS ON HOME PAGE
@@ -61,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert(data.message || "Registration failed.");
                 }
             } catch (err) {
-                console.error(err);
                 alert("Connection Error: " + err.message);
             }
         });
@@ -86,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await res.json();
 
                 if (res.ok) {
-                    // Token save in localStorage
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
                     alert("Login Successful!");
@@ -101,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ------------------------------------------
-    // 4. CREATE BLOG API CALL
+    // 4. CREATE BLOG API CALL (JWT PROTECTED)
     // ------------------------------------------
     const createBlogForm = document.getElementById("createBlogForm");
     if (createBlogForm) {
@@ -110,24 +142,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const title = document.getElementById("postTitle").value;
             const category = document.getElementById("postCategory").value;
             const content = document.getElementById("postContent").value;
-            const user = JSON.parse(localStorage.getItem("user")) || { fullName: "Saad Saleem" };
 
             try {
                 const res = await fetch(`${API_URL}/blogs/create`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        title,
-                        category,
-                        content,
-                        authorName: user.fullName
-                    })
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ title, category, content })
                 });
                 const data = await res.json();
 
                 if (res.ok) {
-                    alert("Blog Created & Saved to Backend!");
-                    window.location.href = "index.html";
+                    alert("Blog Created Successfully!");
+                    window.location.href = "dashboard.html";
                 } else {
                     alert(data.message || "Failed to create blog.");
                 }
@@ -138,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ------------------------------------------
-    // 5. FETCH SINGLE BLOG DETAILS (Module 3 Feature)
+    // 5. FETCH SINGLE BLOG DETAILS
     // ------------------------------------------
     const blogDetailContainer = document.getElementById("blogDetailContainer");
     if (blogDetailContainer) {
@@ -177,4 +206,60 @@ document.addEventListener("DOMContentLoaded", () => {
             blogDetailContainer.innerHTML = "<p>Server Connection Error</p>";
         }
     }
+
+    // ------------------------------------------
+    // 6. DASHBOARD: LOAD LOGGED-IN USER'S BLOGS ONLY (JWT PROTECTED)
+    // ------------------------------------------
+    const userBlogsList = document.getElementById("userBlogsList");
+    if (userBlogsList && token) {
+        loadUserBlogs();
+    }
+
+    async function loadUserBlogs() {
+        try {
+            const res = await fetch(`${API_URL}/blogs/user/my-blogs`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const blogs = await res.json();
+
+            if (blogs.length === 0) {
+                userBlogsList.innerHTML = `<tr><td colspan="5" style="text-align:center;">You haven't created any blogs yet.</td></tr>`;
+                return;
+            }
+
+            userBlogsList.innerHTML = blogs.map(blog => `
+                <tr>
+                    <td class="post-title">${blog.title}</td>
+                    <td>${blog.category}</td>
+                    <td>${new Date(blog.createdAt).toLocaleDateString()}</td>
+                    <td><span class="badge badge-success">Published</span></td>
+                    <td class="action-buttons">
+                        <button class="btn-delete" style="background: #dc3545; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px;" onclick="deleteBlog('${blog._id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            userBlogsList.innerHTML = `<tr><td colspan="5" style="text-align:center;">Failed to load your blogs.</td></tr>`;
+        }
+    }
+
+    // Global Protected Delete Function
+    window.deleteBlog = async function(id) {
+        if (confirm("Are you sure you want to delete this blog?")) {
+            try {
+                const res = await fetch(`${API_URL}/blogs/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    alert("Blog deleted successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to delete blog.");
+                }
+            } catch (err) {
+                alert("Server Connection Error");
+            }
+        }
+    };
 });

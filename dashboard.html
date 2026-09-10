@@ -18,18 +18,20 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="dashboard.html" class="active">Dashboard</a></li>
                 <li><a href="create-blog.html">Create Blog</a></li>
-                <li><a href="login.html" class="btn-login">Login</a></li>
-                <li><a href="register.html" class="btn-register">Register</a></li>
+                <li id="userInfo" style="font-weight: bold; color: #007bff; display: flex; align-items: center;"></li>
+                <li>
+                    <button id="logoutBtn" style="background: #dc3545; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: none;">Logout</button>
+                </li>
             </ul>
         </nav>
     </header>
 
     <!-- Main Dashboard Container -->
     <main class="container">
-        <div class="dashboard-header">
+        <div class="dashboard-header" style="margin-top: 20px;">
             <div>
                 <h2>User Dashboard</h2>
-                <p>Manage your published blogs and articles.</p>
+                <p>Welcome <span id="welcomeUserName" style="font-weight: bold; color: #007bff;">User</span>! Manage your published blogs and articles.</p>
             </div>
             <a href="create-blog.html" class="btn-primary">+ Create New Blog</a>
         </div>
@@ -46,27 +48,8 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td class="post-title">Getting Started with Web Development</td>
-                        <td>Frontend</td>
-                        <td>Sep 10, 2026</td>
-                        <td><span class="badge badge-success">Published</span></td>
-                        <td class="action-buttons">
-                            <button class="btn-edit">Edit</button>
-                            <button class="btn-delete">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="post-title">Mastering Responsive Layouts</td>
-                        <td>Design</td>
-                        <td>Sep 08, 2026</td>
-                        <td><span class="badge badge-success">Published</span></td>
-                        <td class="action-buttons">
-                            <button class="btn-edit">Edit</button>
-                            <button class="btn-delete">Delete</button>
-                        </td>
-                    </tr>
+                <tbody id="userBlogsList">
+                    <!-- Dynamic Logged-in User's Rows will be rendered here by script.js -->
                 </tbody>
             </table>
         </div>
